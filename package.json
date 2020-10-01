@@ -1,0 +1,29 @@
+{
+  "displayName": "Window Covering GPIO",
+  "name": "homebridge-window-covering-gpio",
+  "description": "An accessory plugin for homebridge to control a window covering with a relay via gpio",
+  "main": "index.js",
+  "dependencies": {
+    "request": ">=2.88.0",
+    "ip": ">=1.1.5"
+  },
+  "engines": {
+    "homebridge": ">=0.4.50",
+    "node": ">=12.13.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vincentfuhler/homebridge-window-covering-gpio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vincentfuhler/homebridge-window-covering-gpio/issues"
+  },
+  "keywords": [
+    "homebridge-plugin"
+  ],
+  "author": "Vincent Fuhler",
+  "homepage": "https://github.com/vincentfuhler//homebridge-window-covering-gpio#readme"
+}
