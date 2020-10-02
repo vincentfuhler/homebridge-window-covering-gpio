@@ -25,7 +25,6 @@ function WindowCoveringGPIOAccessory(log, config) {
   this.target = 100;
   this.counter = 0;
   this.angle = -90;
-  this.targetAngle = -90;
 
   this.service = new Service.WindowCovering(this.name);
   this.service.setCharacteristic(Characteristic.TargetPosition, this.target);
@@ -105,6 +104,7 @@ WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
       this.sendSignalOpen('up');
       this.log("new Mode INCREASING.");
       this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, -90);
+
     }
     if (this.mode == Characteristic.PositionState.DECREASING){
       if (oldMode == Characteristic.PositionState.INCREASING){
@@ -267,10 +267,7 @@ WindowCoveringGPIOAccessory.prototype.setState = function(state, callback) {
 WindowCoveringGPIOAccessory.prototype.setAngle = function(angle, callback) {
   this.log("Setting new Taret Angle" + angle.toString());
   this.angle = angle;
-  
-  
-  
-  this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, angle);
+
 
 
 
