@@ -33,6 +33,10 @@ class WindowCoveringGPIOAccessory {
 
   }
 
+  getServices() {
+      return [this.service];
+  }
+
   /**
    * Handle requests to get the current value of the "Current Position" characteristic
    */
