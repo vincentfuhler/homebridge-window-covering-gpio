@@ -1,10 +1,10 @@
-// Example Window Covering Plugin
+
 
 module.exports = (api) => {
-  api.registerAccessory('ExampleWindowCoveringPlugin', ExampleWindowCoveringAccessory);
+  api.registerAccessory('WindowCoveringGPIO', WindowCoveringGPIOAccessory);
 };
 
-class ExampleWindowCoveringAccessory {
+class WindowCoveringGPIOAccessory {
 
   constructor(log, config, api) {
       this.log = log;
