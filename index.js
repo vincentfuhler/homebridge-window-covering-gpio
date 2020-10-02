@@ -283,8 +283,8 @@ WindowCoveringGPIOAccessory.prototype.setAngle = function(angle, callback) {
     setTimeout(()=>rpio.write(this.downGPIO, 1), targetDifference);
   }
   this.angle = angle;
-  his.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, this.angle);
-  //this.sendSignalOpen('up');
+  this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, this.angle);
+
 
   setTimeout(function(){
     callback(null);
