@@ -1,7 +1,7 @@
 {
   "displayName": "Window Covering GPIO",
   "name": "homebridge-window-covering-gpio",
-  "version":"0.1.4",
+  "version":"0.1.6",
   "description": "An accessory plugin for homebridge to control a window covering with a relay via gpio",
   "main": "index.js",
   "dependencies": {
