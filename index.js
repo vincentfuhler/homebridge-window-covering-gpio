@@ -18,7 +18,7 @@ class WindowCoveringGPIOAccessory {
       this.name = config.name;
 
       // create a new Window Covering service
-      this.service = new this.Service(this.Service.WindowCovering);
+      this.service = new this.Service(this.Service.WindowCovering, '0a239b04-e12a-47ea-b276-73482ddc808c');
 
       // create handlers for required characteristics
       this.service.getCharacteristic(this.Characteristic.CurrentPosition)
