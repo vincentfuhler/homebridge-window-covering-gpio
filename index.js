@@ -24,7 +24,9 @@ function WindowCoveringGPIOAccessory(log, config) {
   this.current = 100;
   this.target = 100;
   this.counter = 0;
+
   this.angle = -90;
+  this.angleTime = 1.5
 
   this.service = new Service.WindowCovering(this.name);
   this.service.setCharacteristic(Characteristic.TargetPosition, this.target);
@@ -61,12 +63,14 @@ WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
           // This is a Stp Signal.
           this.sendSignalOpen('stopUp');
           this.mode = mode;
+          this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, -90);
           this.service.setCharacteristic(Characteristic.PositionState, mode);         
           return
         }
         if (this.current == 100) {
           this.sendSignalOpen('stopUp100');
           this.mode = mode;
+          this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, -90);
           this.service.setCharacteristic(Characteristic.PositionState, mode);
           return
         }
@@ -76,12 +80,14 @@ WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
           // This is a Stop Signal
           this.sendSignalOpen('stopDown');
           this.mode = mode;
+          this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, 90);
           this.service.setCharacteristic(Characteristic.PositionState, mode);
           return
         }
         if (this.current == 0) {
           this.sendSignalOpen('stopDown100');
           this.mode = mode;
+          this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, 90);
           this.service.setCharacteristic(Characteristic.PositionState, mode);
           return
         }
@@ -266,12 +272,19 @@ WindowCoveringGPIOAccessory.prototype.setState = function(state, callback) {
 }
 WindowCoveringGPIOAccessory.prototype.setAngle = function(angle, callback) {
   this.log("Setting new Taret Angle" + angle.toString());
+  
+  var timeDegree = (this.angleTime * 100) / 180;
+  var targetDifference = this.angle - angle;
+  if (angle > this.angle){
+    rpio.write(this.upGPIO, 0);
+    setTimeout(()=>rpio.write(this.upGPIO, 1), targetDifference);
+  }else{
+    rpio.write(this.downGPIO, 0);
+    setTimeout(()=>rpio.write(this.downGPIO, 1), targetDifference);
+  }
   this.angle = angle;
-
-
-
-
-
+  his.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, this.angle);
+  //this.sendSignalOpen('up');
 
   setTimeout(function(){
     callback(null);
