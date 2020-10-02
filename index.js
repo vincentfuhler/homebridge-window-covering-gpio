@@ -15,8 +15,8 @@ function WindowCoveringGPIOAccessory(log, config) {
 
   this.log = log;
   this.name = config["name"];
-  this.openGPIO = config["open-gpio"];
-  this.closeGPIO = config["close-gpio"];
+  this.upGPIO = config["up-gpio"];
+  this.downGPIO = config["down-gpio"];
   this.valueMapping = config['valueMapping'];
   this.mode = Characteristic.PositionState.STOPPED;
   this.openTime = config["open-Time"] 	  	 	|| 65.0;;
@@ -39,8 +39,8 @@ function WindowCoveringGPIOAccessory(log, config) {
   .getCharacteristic(Characteristic.TargetPosition)
   .on('set', this.setState.bind(this));
 
-  rpio.open(this.openGPIO, rpio.OUTPUT, 0);
-  rpio.open(this.closeGPIO, rpio.OUTPUT, 0);
+  rpio.open(this.upGPIO, rpio.OUTPUT, 1);
+  rpio.open(this.downGPIO, rpio.OUTPUT, 1);
 }
 
 WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
@@ -54,12 +54,13 @@ WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
       if (oldMode == Characteristic.PositionState.INCREASING ){
         if (this.target < 90 ) {
           // This is a Stp Signal.
-          this.sendSignalOpen(false);
+          this.sendSignalOpen('stopUp');
           this.mode = mode;
           this.service.setCharacteristic(Characteristic.PositionState, mode);
           return
         }
         if (this.current == 100) {
+          this.sendSignalOpen('stopUp100');
           this.mode = mode;
           this.service.setCharacteristic(Characteristic.PositionState, mode);
           return
@@ -68,12 +69,13 @@ WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
       if (oldMode == Characteristic.PositionState.DECREASING){
         if (this.target > 10 ) {
           // This is a Stop Signal
-          this.sendSignalOpen(false);
+          this.sendSignalOpen('stopDown');
           this.mode = mode;
           this.service.setCharacteristic(Characteristic.PositionState, mode);
           return
         }
         if (this.current == 0) {
+          this.sendSignalOpen('stopDown100');
           this.mode = mode;
           this.service.setCharacteristic(Characteristic.PositionState, mode);
           return
@@ -92,18 +94,18 @@ WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
       if (oldMode == Characteristic.PositionState.DECREASING){
         // Double Send for first Stopping.
         var THIS = this;
-        setTimeout(function(){ THIS.sendSignalOpen(true); } , 3000);
+        setTimeout(function(){ THIS.sendSignalOpen('up'); } , 3000);
       }
-      this.sendSignalOpen(true);
+      this.sendSignalOpen('up');
       this.log("new Mode INCREASING.");
     }
     if (this.mode == Characteristic.PositionState.DECREASING){
       if (oldMode == Characteristic.PositionState.INCREASING){
         // Double Send for first Stopping.
         var THIS = this;
-        setTimeout(function(){ THIS.sendSignalOpen(false); } , 3000);
+        setTimeout(function(){ THIS.sendSignalOpen('down'); } , 3000);
       }
-      this.sendSignalOpen(false);
+      this.sendSignalOpen('down');
       this.log("new Mode DECREASING.");
     }
     this.service.setCharacteristic(Characteristic.PositionState, mode);
@@ -122,14 +124,40 @@ WindowCoveringGPIOAccessory.prototype.setCurrentPosition = function(position){
   this.current = positionInInterval;
   this.log("New Position:" + positionInInterval.toString());
 }
-WindowCoveringGPIOAccessory.prototype.sendSignalOpen = function(open) {
-  if (open){
-    this.log("Will Send on openGPIO");
-    rpio.write(this.openGPIO);
-  } else {
-    this.log("Will Send on CloseGPIO");
-    rpio.write(this.closeGPIO);
-  }
+WindowCoveringGPIOAccessory.prototype.sendSignalOpen = function(job) {
+
+if (job == 'up'){
+  this.log("Will Send on up");
+  rpio.write(this.downGPIO, 1);
+  rpio.write(this.upGPIO, 0);
+} else if (job == 'down'){
+  this.log("Will Send on down");
+  rpio.write(this.upGPIO, 1);
+  rpio.write(this.downGPIO, 0);
+
+}else if (job == 'stopDown'){
+  this.log("Will Send on stopDown");
+  rpio.write(this.downGPIO, 1);
+  rpio.write(this.upGPIO, 0);
+  setTimeout(()=>rpio.write(this.upGPIO, 1), 500);
+  
+
+}else if (job == 'stopUp'){
+  this.log("Will Send on stopUp");
+  rpio.write(this.upGPIO, 1);
+  rpio.write(this.downGPIO, 0);
+  setTimeout(()=>rpio.write(this.downGPIO, 1), 500);
+  
+}else if (job == 'stopDown100'){
+  this.log("Will Send on stopDown100");
+  rpio.write(this.downGPIO, 1);
+  
+}else if (job == 'stopUp100'){
+  this.log("Will Send on stopUp100");
+  rpio.write(this.upGPIO, 1);
+  
+}
+
 }
 
 WindowCoveringGPIOAccessory.prototype.checkPositionState = function() {
