@@ -1,15 +1,14 @@
 var request = require("request");
 var Service, Characteristic;
-var url = require('url');
-var http = require("http");
 var inherits = require('util').inherits;
+var rpio = require('rpio');
 
 var allCoverings = {};
 
 module.exports = function(homebridge) {
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic; 
-  homebridge.registerAccessory("WindowCoveringGPIO", "Window-Covering-GPIO", WindowCoveringGPIOAccessory);
+  homebridge.registerAccessory("window-covering-gpio", "WindowCoveringGPIO", WindowCoveringGPIOAccessory);
 }
 
 function WindowCoveringGPIOAccessory(log, config) {
@@ -39,9 +38,12 @@ function WindowCoveringGPIOAccessory(log, config) {
   this.service
   .getCharacteristic(Characteristic.TargetPosition)
   .on('set', this.setState.bind(this));
+
+  rpio.open(this.openGPIO, rpio.OUTPUT, 0);
+  rpio.open(this.closeGPIO, rpio.OUTPUT, 0);
 }
 
-HTTPWindowCoveringAccessory.prototype.setCurrentMode = function(mode){
+WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
   if (this.mode == mode) {
     // Nothing to do here.
   } else {
@@ -108,7 +110,7 @@ HTTPWindowCoveringAccessory.prototype.setCurrentMode = function(mode){
     this.checkPositionStateAfterTimeout();
   }
 }
-HTTPWindowCoveringAccessory.prototype.setCurrentPosition = function(position){
+WindowCoveringGPIOAccessory.prototype.setCurrentPosition = function(position){
   var positionInInterval = position;
   if (position > 100){
     positionInInterval = 100;
@@ -120,25 +122,17 @@ HTTPWindowCoveringAccessory.prototype.setCurrentPosition = function(position){
   this.current = positionInInterval;
   this.log("New Position:" + positionInInterval.toString());
 }
-HTTPWindowCoveringAccessory.prototype.sendSignalOpen = function(open) {
+WindowCoveringGPIOAccessory.prototype.sendSignalOpen = function(open) {
   if (open){
     this.log("Will Send on openGPIO");
+    rpio.write(this.openGPIO);
   } else {
     this.log("Will Send on CloseGPIO");
+    rpio.write(this.closeGPIO);
   }
-  var url = open ? this.openGPIO : this.closeGPIO;
-  request.put({
-    url: url,
-    qs: { }
-  }, function(err, response, body) {
-    if (!err && response.statusCode == 200) {  }
-    else {
-      this.log("Error '%s' setting lock state. Response: %s", err, body);
-    }
-  }.bind(this));
 }
 
-HTTPWindowCoveringAccessory.prototype.checkPositionState = function() {
+WindowCoveringGPIOAccessory.prototype.checkPositionState = function() {
   if (this.mode == Characteristic.PositionState.STOPPED){
     return;
   }
@@ -159,13 +153,13 @@ HTTPWindowCoveringAccessory.prototype.checkPositionState = function() {
   this.checkPositionStateAfterTimeout();
 
 }
-HTTPWindowCoveringAccessory.prototype.checkPositionStateAfterTimeout = function() {
+WindowCoveringGPIOAccessory.prototype.checkPositionStateAfterTimeout = function() {
   var THIS = this;
   setTimeout(function(){
       THIS.checkPositionState();
   }, 1000);
 }
-HTTPWindowCoveringAccessory.prototype.makeDirectSelectCharacteristic = function(name) {
+WindowCoveringGPIOAccessory.prototype.makeDirectSelectCharacteristic = function(name) {
   var values = [];
   for (var sendingString in this.valueMapping){
     values.push(sendingString);
@@ -184,7 +178,7 @@ HTTPWindowCoveringAccessory.prototype.makeDirectSelectCharacteristic = function(
 },
 
 
-HTTPWindowCoveringAccessory.prototype.setDirectSelect = function (stringValue, callback) {
+WindowCoveringGPIOAccessory.prototype.setDirectSelect = function (stringValue, callback) {
    var value = -1;
    if (typeof stringValue == 'undefined') {
      callback(new Error("No String Defiend"));
@@ -204,12 +198,12 @@ HTTPWindowCoveringAccessory.prototype.setDirectSelect = function (stringValue, c
   }
 }
 
-HTTPWindowCoveringAccessory.prototype.getState = function(callback) {
+WindowCoveringGPIOAccessory.prototype.getState = function(callback) {
   this.service.setCharacteristic(Characteristic.CurrentPosition, this.current);
   callback(null,this.current);
 }
 
-HTTPWindowCoveringAccessory.prototype.setState = function(state, callback) {
+WindowCoveringGPIOAccessory.prototype.setState = function(state, callback) {
   this.log("Setting new Taret Position" + state.toString());
   this.target = state;
   // ToleranceValue will only be Applied to States between 10% and 90%
@@ -235,6 +229,6 @@ HTTPWindowCoveringAccessory.prototype.setState = function(state, callback) {
 
 }
 
-HTTPWindowCoveringAccessory.prototype.getServices = function() {
+WindowCoveringGPIOAccessory.prototype.getServices = function() {
   return [this.service];
 }
