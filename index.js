@@ -58,11 +58,11 @@ function WindowCoveringGPIOAccessory(log, config) {
 
   this.service
   .getCharacteristic(Characteristic.TargetPosition)
-  .on('set', this.setState.bind(this));
+  .on('set', debounce(this.setState.bind(this), 500));
 
   this.service
   .getCharacteristic(Characteristic.TargetHorizontalTiltAngle)
-  .on('set', this.setAngle.bind(this));
+  .on('set', debounce(this.setAngle.bind(this), 500));
 
   rpio.open(this.upGPIO, rpio.OUTPUT, 1);
   rpio.open(this.downGPIO, rpio.OUTPUT, 1);
@@ -263,7 +263,7 @@ WindowCoveringGPIOAccessory.prototype.getState = function(callback) {
   callback(null,this.current);
 }
 
-WindowCoveringGPIOAccessory.prototype.setState = debounce(function(state, callback) {
+WindowCoveringGPIOAccessory.prototype.setState = function(state, callback) {
   this.log("Setting new Taret Position" + state.toString());
   this.target = state;
   // ToleranceValue will only be Applied to States between 10% and 90%
@@ -287,8 +287,8 @@ WindowCoveringGPIOAccessory.prototype.setState = debounce(function(state, callba
   }, 500);
 
 
-}, 500);
-WindowCoveringGPIOAccessory.prototype.setAngle = debounce(function(angle, callback) {
+};
+WindowCoveringGPIOAccessory.prototype.setAngle = function(angle, callback) {
   this.log("Setting new Taret Angle" + angle.toString());
   var timeDegree = (this.angleTime * 100) / 180;
   var targetDifference = Math.abs(this.angle - angle);
@@ -311,7 +311,7 @@ WindowCoveringGPIOAccessory.prototype.setAngle = debounce(function(angle, callba
   setTimeout(function(){
     callback(null);
   }, 500);
-}, 500);
+};
 
 WindowCoveringGPIOAccessory.prototype.getServices = function() {
   return [this.service];
