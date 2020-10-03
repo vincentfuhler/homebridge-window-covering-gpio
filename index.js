@@ -279,11 +279,11 @@ WindowCoveringGPIOAccessory.prototype.setAngle = function(angle, callback) {
     this.log("Will not Change because in tolerance "+targetDifference);
   }else{
     if (angle > this.angle){
-      rpio.write(this.upGPIO, 0);
-      setTimeout(()=>rpio.write(this.upGPIO, 1), (targetDifference+350));
-    }else{
       rpio.write(this.downGPIO, 0);
-      setTimeout(()=>rpio.write(this.downGPIO, 1), (targetDifference+350));
+      setTimeout(()=>rpio.write(this.downGPIO, 1), (targetDifference+500));
+    }else{
+      rpio.write(this.upGPIO, 0);
+      setTimeout(()=>rpio.write(this.upGPIO, 1), (targetDifference+500));
     }
     this.angle = angle;
   }
