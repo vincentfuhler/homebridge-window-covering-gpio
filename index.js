@@ -273,10 +273,10 @@ WindowCoveringGPIOAccessory.prototype.setState = function(state, callback) {
 WindowCoveringGPIOAccessory.prototype.setAngle = function(angle, callback) {
   this.log("Setting new Taret Angle" + angle.toString());
   var timeDegree = (this.angleTime * 100) / 180;
-  var targetDifference = this.angle - angle;
+  var targetDifference = Math.abs(this.angle - angle);
 
   if(targetDifference<10){
-    this.log("Will not Change because in tolerance");
+    this.log("Will not Change because in tolerance "+targetDifference);
   }else{
     if (angle > this.angle){
       rpio.write(this.upGPIO, 0);
