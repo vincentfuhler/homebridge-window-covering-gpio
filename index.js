@@ -64,6 +64,7 @@ WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
           this.sendSignalOpen('stopUp');
           this.mode = mode;
           this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, 90);
+          this.angle = 90;
           this.service.setCharacteristic(Characteristic.PositionState, mode);         
           return
         }
@@ -71,6 +72,7 @@ WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
           this.sendSignalOpen('stopUp100');
           this.mode = mode;
           this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, 90);
+          this.angle = 90;
           this.service.setCharacteristic(Characteristic.PositionState, mode);
           return
         }
@@ -81,6 +83,7 @@ WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
           this.sendSignalOpen('stopDown');
           this.mode = mode;
           this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, -90);
+          this.angle = -90;
           this.service.setCharacteristic(Characteristic.PositionState, mode);
           return
         }
@@ -88,6 +91,7 @@ WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
           this.sendSignalOpen('stopDown100');
           this.mode = mode;
           this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, -90);
+          this.angle = -90;
           this.service.setCharacteristic(Characteristic.PositionState, mode);
           return
         }
@@ -110,6 +114,7 @@ WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
       this.sendSignalOpen('up');
       this.log("new Mode INCREASING.");
       this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, -90);
+      this.angle = -90;
 
     }
     if (this.mode == Characteristic.PositionState.DECREASING){
