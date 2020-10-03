@@ -26,7 +26,7 @@ function WindowCoveringGPIOAccessory(log, config) {
   this.counter = 0;
 
   this.angle = 90;
-  this.angleTime = 2.5
+  this.angleTime = config["angle-Time"] || 1.8;;
 
   this.service = new Service.WindowCovering(this.name);
   this.service.setCharacteristic(Characteristic.TargetPosition, this.target);
@@ -275,15 +275,21 @@ WindowCoveringGPIOAccessory.prototype.setAngle = function(angle, callback) {
   var timeDegree = (this.angleTime * 100) / 180;
   var targetDifference = Math.abs(this.angle - angle);
 
+  this.log("this.angleTime " + this.angleTime.toString());
+  this.log("timeDegree" + timeDegree.toString());
+  this.log("targetDifference" + targetDifference.toString());
+  this.log("this.angle " + this.angle.toString()+ " angle " + angle.toString());
+
+
   if(targetDifference<10){
     this.log("Will not Change because in tolerance" );
   }else{
     if (angle > this.angle){
       rpio.write(this.upGPIO, 0);
-      setTimeout(()=>rpio.write(this.upGPIO, 1), (targetDifference+350));
+      setTimeout(()=>rpio.write(this.upGPIO, 1), (targetDifference * timeDegree+250));
     }else{
       rpio.write(this.downGPIO, 0);
-      setTimeout(()=>rpio.write(this.downGPIO, 1), (targetDifference+350));
+      setTimeout(()=>rpio.write(this.downGPIO, 1), (targetDifference * timeDegree+250));
     }
     this.angle = angle;
   }
