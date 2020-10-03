@@ -11,6 +11,24 @@ module.exports = function(homebridge) {
   homebridge.registerAccessory("window-covering-gpio", "WindowCoveringGPIO", WindowCoveringGPIOAccessory);
 }
 
+/* Taken from {@link https://davidwalsh.name/javascript-debounce-function} */
+function debounce(func, wait, immediate) {
+	var timeout;
+
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow)
+            func.apply(context, args);
+	};
+};
+
 function WindowCoveringGPIOAccessory(log, config) {
 
   this.log = log;
@@ -245,7 +263,7 @@ WindowCoveringGPIOAccessory.prototype.getState = function(callback) {
   callback(null,this.current);
 }
 
-WindowCoveringGPIOAccessory.prototype.setState = function(state, callback) {
+WindowCoveringGPIOAccessory.prototype.setState = debounce(function(state, callback) {
   this.log("Setting new Taret Position" + state.toString());
   this.target = state;
   // ToleranceValue will only be Applied to States between 10% and 90%
@@ -269,8 +287,8 @@ WindowCoveringGPIOAccessory.prototype.setState = function(state, callback) {
   }, 500);
 
 
-}
-WindowCoveringGPIOAccessory.prototype.setAngle = function(angle, callback) {
+}, 500);
+WindowCoveringGPIOAccessory.prototype.setAngle = debounce(function(angle, callback) {
   this.log("Setting new Taret Angle" + angle.toString());
   var timeDegree = (this.angleTime * 100) / 180;
   var targetDifference = Math.abs(this.angle - angle);
@@ -293,7 +311,7 @@ WindowCoveringGPIOAccessory.prototype.setAngle = function(angle, callback) {
   setTimeout(function(){
     callback(null);
   }, 500);
-}
+}, 500);
 
 WindowCoveringGPIOAccessory.prototype.getServices = function() {
   return [this.service];
