@@ -25,8 +25,8 @@ function WindowCoveringGPIOAccessory(log, config) {
   this.target = 100;
   this.counter = 0;
 
-  this.angle = -90;
-  this.angleTime = 2
+  this.angle = 90;
+  this.angleTime = 2.5
 
   this.service = new Service.WindowCovering(this.name);
   this.service.setCharacteristic(Characteristic.TargetPosition, this.target);
@@ -63,14 +63,14 @@ WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
           // This is a Stp Signal.
           this.sendSignalOpen('stopUp');
           this.mode = mode;
-          this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, -90);
+          this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, 90);
           this.service.setCharacteristic(Characteristic.PositionState, mode);         
           return
         }
         if (this.current == 100) {
           this.sendSignalOpen('stopUp100');
           this.mode = mode;
-          this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, -90);
+          this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, 90);
           this.service.setCharacteristic(Characteristic.PositionState, mode);
           return
         }
@@ -80,14 +80,14 @@ WindowCoveringGPIOAccessory.prototype.setCurrentMode = function(mode){
           // This is a Stop Signal
           this.sendSignalOpen('stopDown');
           this.mode = mode;
-          this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, 90);
+          this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, -90);
           this.service.setCharacteristic(Characteristic.PositionState, mode);
           return
         }
         if (this.current == 0) {
           this.sendSignalOpen('stopDown100');
           this.mode = mode;
-          this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, 90);
+          this.service.setCharacteristic(Characteristic.TargetHorizontalTiltAngle, -90);
           this.service.setCharacteristic(Characteristic.PositionState, mode);
           return
         }
@@ -276,22 +276,14 @@ WindowCoveringGPIOAccessory.prototype.setAngle = function(angle, callback) {
   var targetDifference = Math.abs(this.angle - angle);
 
   if(targetDifference<10){
-    this.log("Will not Change because in tolerance "+targetDifference);
+    this.log("Will not Change because in tolerance" );
   }else{
     if (angle > this.angle){
-<<<<<<< HEAD
-      rpio.write(this.downGPIO, 0);
-      setTimeout(()=>rpio.write(this.downGPIO, 1), (targetDifference+300));
-    }else{
-      rpio.write(this.upGPIO, 0);
-      setTimeout(()=>rpio.write(this.upGPIO, 1), (targetDifference+300));
-=======
       rpio.write(this.upGPIO, 0);
       setTimeout(()=>rpio.write(this.upGPIO, 1), (targetDifference+350));
     }else{
       rpio.write(this.downGPIO, 0);
       setTimeout(()=>rpio.write(this.downGPIO, 1), (targetDifference+350));
->>>>>>> parent of b21ac39... acceptance delay
     }
     this.angle = angle;
   }
