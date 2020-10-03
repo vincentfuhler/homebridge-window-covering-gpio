@@ -279,11 +279,19 @@ WindowCoveringGPIOAccessory.prototype.setAngle = function(angle, callback) {
     this.log("Will not Change because in tolerance "+targetDifference);
   }else{
     if (angle > this.angle){
+<<<<<<< HEAD
       rpio.write(this.downGPIO, 0);
       setTimeout(()=>rpio.write(this.downGPIO, 1), (targetDifference+300));
     }else{
       rpio.write(this.upGPIO, 0);
       setTimeout(()=>rpio.write(this.upGPIO, 1), (targetDifference+300));
+=======
+      rpio.write(this.upGPIO, 0);
+      setTimeout(()=>rpio.write(this.upGPIO, 1), (targetDifference+350));
+    }else{
+      rpio.write(this.downGPIO, 0);
+      setTimeout(()=>rpio.write(this.downGPIO, 1), (targetDifference+350));
+>>>>>>> parent of b21ac39... acceptance delay
     }
     this.angle = angle;
   }
