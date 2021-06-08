@@ -1,0 +1,25 @@
+{
+    "bridge": {
+      "name": "Homebridge",
+      "username": "CC:22:3D:E3:CE:30",
+      "port": 51826,
+      "pin": "031-45-154"
+    },
+    "description": "This is an example configuration for the Homebridge Window Covering GPIO",
+    "accessories": [
+      {
+        "accessory": "WindowCoveringGPIO",
+        "name": "Window Covering",
+        "up-gpio": 5,
+        "down-gpio": 3,
+        "open-Time":2000,
+        "close-Time":2000,
+        "valueMapping": {
+            "closed": 0,
+            "kind of closed": 30,
+            "open": 100
+        }
+      }
+    ]
+  }
+  
